@@ -1,3 +1,4 @@
+// -*-C++-*-
 #include "textunit.h"
 #include "gtest/gtest.h"
 #include <string.h>
@@ -5,21 +6,31 @@
 namespace {
 
   TEST(TextUnitValue,Create) {
-  TextUnitValue* tu0 = TextUnitValue::create(10);
-  ASSERT_TRUE(tu0);
-  EXPECT_EQ(10, tu0->length());
-  EXPECT_EQ(((const char*)tu0)+sizeof(uint16_t), (const char*)tu0->data());
-  TextUnitValue::destroy(tu0);
-  tu0 = 0;
+    TextUnitValue* tuv0 = TextUnitValue::create(10);
+    ASSERT_TRUE(tuv0);
+    EXPECT_EQ(10, tuv0->length());
+    EXPECT_EQ(((const char*)tuv0)+sizeof(uint16_t), (const char*)tuv0->data());
+    TextUnitValue::destroy(tuv0);
+    tuv0 = 0;
 
-  static const char* foobar = "foobar";
-  tu0 = TextUnitValue::create(foobar);
-  ASSERT_TRUE(tu0);
-  EXPECT_EQ(strlen(foobar), tu0->length());
-  EXPECT_EQ(((const char*)tu0)+sizeof(uint16_t), (const char*)tu0->data());
-  EXPECT_EQ(0, strcmp(foobar, (const char*) tu0->data()));
-  TextUnitValue::destroy(tu0);
-}
+    static const char* foobar = "foobar";
+    tuv0 = TextUnitValue::create(foobar);
+    ASSERT_TRUE(tuv0);
+    EXPECT_EQ(strlen(foobar), tuv0->length());
+    EXPECT_EQ(((const char*)tuv0)+sizeof(uint16_t), (const char*)tuv0->data());
+    EXPECT_EQ(0, strcmp(foobar, (const char*) tuv0->data()));
+    TextUnitValue::destroy(tuv0);
+  }
+
+  TEST(TextUnit,Create) {
+    TextUnit* tu0 = TextUnit::create(42, {"foo", "bar", "bas"});
+    ASSERT_TRUE(tu0);
+    EXPECT_EQ(42, tu0->key());
+    EXPECT_EQ(3, tu0->number());
+    TextUnit::destroy(tu0);
+    tu0 = 0;
+
+  }
 
 }  // namespace
 

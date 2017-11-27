@@ -37,6 +37,7 @@ CPPFLAGS = \
  -I./googletest/googletest/include \
  -m64 \
  -Wall \
+ -std=c++11 \
  -D__STDC_FORMAT_MACROS \
  -D_XOPEN_SOURCE=600 \
  ${SORT_DEFINITIONS} \
@@ -141,8 +142,9 @@ endif
 # List all source files (NOT headers) in SRCS; these will be
 # processed to have dependencies auto-generated
 SRCS = \
- textunit.c \
- textunit_test.c \
+ textunit.cpp \
+ textunits.cpp \
+ textunit_test.cpp \
  ${EMPTY}
 
 # Targets start here

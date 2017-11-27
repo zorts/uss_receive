@@ -1,6 +1,8 @@
+// -*-C++-*-
 #include "textunit.h"
 
 #include <string.h>
+#include <algorithm>
 
 TextUnitValue* TextUnitValue::at(void* where) {
   return (TextUnitValue*) where;
@@ -33,16 +35,47 @@ void TextUnitValue::destroy(TextUnitValue* what) {
   delete [] space;
 }
 
-const TextUnitValueIterator TextUnitBase::begin() const {
+void TextUnitValue::setLength(uint16_t length) {
+  length_ = length;
+}
+
+const TextUnitValueIterator TextUnit::begin() const {
   return TextUnitValueIterator(*this);
 }
 
-const TextUnitValueIterator TextUnitBase::end() const {
-  return TextUnitValueIterator(*this, 0, firstTextUnit());
+const TextUnitValueIterator TextUnit::end() const {
+  return TextUnitValueIterator(*this, 0, firstTextUnitValue());
 }
 
-TextUnitValueIterator::TextUnitValueIterator(const TextUnitBase& base, uint16_t index, const TextUnitValue* ptr)
+TextUnitValueIterator::TextUnitValueIterator(const TextUnit& base, uint16_t index, const TextUnitValue* ptr)
   : base_(&base)
   , pos_(index)
   , ptr_(ptr)
 {}
+
+struct LengthSummation {
+  size_t total_;
+  LengthSummation() : total_(0) {}
+  void operator()(const std::string& s) {
+    total_ += s.size()+sizeof(uint16_t);
+  }
+};
+
+TextUnit* TextUnit::create(uint16_t key, const StringVector& values) {
+  LengthSummation len = std::for_each(values.begin(), values.end(), LengthSummation());
+  size_t space = sizeof(TextUnit)+len.total_;
+  TextUnit* result = (TextUnit*) (new char[space]);
+  result->setKey(key);
+  result->setNumber((uint16_t)values.size());
+  TextUnitValue* value = result->firstTextUnitValue();
+  for (StringVector::const_iterator it = values.begin(); it != values.end(); ++it) {
+    value->setLength((uint16_t)it->size());
+    memcpy(value->data(), it->data(), value->length());
+    value = value->next();
+  }
+  return result;
+}
+
+void TextUnit::destroy(TextUnit* unit) {
+  delete [] ((char*)unit);
+}

@@ -1,8 +1,11 @@
+// -*-C++-*-
 #ifndef _XMIT_TEXTUNIT_H_
 #define _XMIT_TEXTUNIT_H_
 
 #include <stdint.h>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 class TextUnitValue {
 public:
@@ -20,17 +23,23 @@ public:
     return (const TextUnitValue*)(base+sizeof(length_)+length_);
   }
 
+  inline TextUnitValue* next() {
+    char* base = (char*) this;
+    return (TextUnitValue*)(base+sizeof(length_)+length_);
+  }
+
   static inline const TextUnitValue* at(const void* where) {
     return (const TextUnitValue*) where;
   }
 
   // Primarily for testing
   static TextUnitValue* at(void* where);
-  void* data();
   static TextUnitValue* create(uint16_t size);
   static TextUnitValue* create(const char* source);
   static void destroy(TextUnitValue* what);
-
+  void* data();
+  void setLength(uint16_t length);
+  
 private:
   // Prohibit copy/assign; do not implement
   TextUnitValue(const TextUnitValue&);
@@ -39,9 +48,9 @@ private:
   uint16_t length_;
 };
 
-
+typedef std::vector<std::string> StringVector;
 class TextUnitValueIterator;
-class TextUnitBase {
+class TextUnit {
 public:
 
   inline uint16_t key() const {
@@ -52,25 +61,40 @@ public:
     return number_;
   }
 
-  inline const TextUnitValue* firstTextUnit() const {
+  inline const TextUnitValue* firstTextUnitValue() const {
     const char* base = (const char*) this;
     return TextUnitValue::at(base+sizeof(key_)+sizeof(number_));
   }
 
-  static inline const TextUnitBase* at(const void* where) {
-    return (const TextUnitBase*) where;
+  inline TextUnitValue* firstTextUnitValue() {
+    char* base = (char*) this;
+    return TextUnitValue::at(base+sizeof(key_)+sizeof(number_));
+  }
+
+  static inline const TextUnit* at(const void* where) {
+    return (const TextUnit*) where;
   }
 
   const TextUnitValueIterator begin() const;
   const TextUnitValueIterator end() const;
 
+  // Primarily for testing
+  static TextUnit* create(uint16_t key, const StringVector& values);
+  static void destroy(TextUnit* unit);
+  void setKey(uint16_t key) {
+    key_ = key;
+  }
+  void setNumber(uint16_t number) {
+    number_ = number;
+  }
+
 private:
   // At the moment, it's not possible to create text units.
-  TextUnitBase();
+  TextUnit();
 
   // Prohibit copy/assign; do not implement
-  TextUnitBase(const TextUnitBase&);
-  TextUnitBase& operator=(const TextUnitBase&);
+  TextUnit(const TextUnit&);
+  TextUnit& operator=(const TextUnit&);
 
   uint16_t key_;
   uint16_t number_;
@@ -78,10 +102,10 @@ private:
 
 class TextUnitValueIterator {
 public:
-  TextUnitValueIterator(const TextUnitBase& base)
+  TextUnitValueIterator(const TextUnit& base)
     : base_(&base)
     , pos_(0)
-    , ptr_(base.firstTextUnit())
+    , ptr_(base.firstTextUnitValue())
   {}
 
   TextUnitValueIterator(const TextUnitValueIterator& rhs)
@@ -126,13 +150,14 @@ public:
   }
   
 private:
-  friend class TextUnitBase;
+  friend class TextUnit;
 
-  TextUnitValueIterator(const TextUnitBase& base, uint16_t index, const TextUnitValue* ptr);
+  TextUnitValueIterator(const TextUnit& base, uint16_t index, const TextUnitValue* ptr);
 
-  const TextUnitBase* base_;
+  const TextUnit* base_;
   uint16_t pos_;
   const TextUnitValue* ptr_;
 };
+
 
 #endif // _XMIT_TEXTUNIT_H_
