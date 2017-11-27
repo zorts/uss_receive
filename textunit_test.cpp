@@ -1,5 +1,6 @@
 // -*-C++-*-
 #include "textunit.h"
+#include "textunits.h"
 #include "gtest/gtest.h"
 #include <string.h>
 
@@ -30,6 +31,12 @@ namespace {
     TextUnit::destroy(tu0);
     tu0 = 0;
 
+  }
+
+  TEST(TextUnitDictionary,Create) {
+    TextUnitDictionary* dict = new TextUnitDictionary;
+    ASSERT_TRUE(dict);
+    delete dict;
   }
 
 }  // namespace

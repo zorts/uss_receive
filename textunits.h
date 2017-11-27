@@ -3,7 +3,7 @@
 #define _XMIT_TEXTUNITS_H_
 
 #include "textunit.h"
-#include <isofwd>
+#include <iosfwd>
 #include <string>
 
 class TextUnitDescrBase {
@@ -53,13 +53,48 @@ private:
   bool singleton_;
 };
 
-class StringTextUnitDescrBase : public TextUnitDescr {
- StringTextUnitDescrBase(uint16_t key,
-                         const char* mnemonic,
-                         const char* label,
-                         bool singleton = true);
+class TextUnitDictionaryImpl;
+class TextUnitDictionary {
+public:
+  TextUnitDictionary();
+  ~TextUnitDictionary();
+
+  const TextUnitDescrBase* descriptorFor(uint16_t key) const;
+
+private:
+  // Prohibit copy/assign; do not implement
+  TextUnitDictionary(const TextUnitDictionary&);
+  TextUnitDictionary& operator=(const TextUnitDictionary&);
+
+  TextUnitDictionaryImpl* impl_;
+};
+
+class StringTextUnitDescrBase : public TextUnitDescrBase {
+public:
+  StringTextUnitDescrBase(uint16_t key,
+                          const char* mnemonic,
+                          const char* label,
+                          bool singleton);
 
   virtual void display(std::ostream& s, const TextUnit* unit) const;
   virtual std::string value(const TextUnit* u) const;
   virtual std::string value(const TextUnitValue* v) const;
 };
+
+class NumericTextUnitDescrBase : public TextUnitDescrBase {
+public:
+  NumericTextUnitDescrBase(uint16_t key,
+                           const char* mnemonic,
+                           const char* label,
+                           bool hex = false,
+                           bool singleton = true);
+
+  virtual void display(std::ostream& s, const TextUnit* unit) const;
+  virtual uint64_t value(const TextUnit* u) const;
+  virtual uint64_t value(const TextUnitValue* v) const;
+
+private:
+  bool hex_;
+};
+
+#endif // _XMIT_TEXTUNITS_H_

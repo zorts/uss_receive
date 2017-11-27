@@ -166,6 +166,7 @@ endif
 
 textunit_test: textunit_test.o \
  textunit.o \
+ textunits.o \
  googletest/googletest/make/gtest-all.o \
  ${MVSOBJS} \
  ${EMPTY}
