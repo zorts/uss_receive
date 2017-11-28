@@ -36,8 +36,10 @@ namespace {
   TEST(TextUnitDictionary,Create) {
     TextUnitDictionary* dict = new TextUnitDictionary;
     ASSERT_TRUE(dict);
+    ASSERT_TRUE(dict->size());
     delete dict;
   }
+
 
 }  // namespace
 

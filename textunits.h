@@ -5,6 +5,7 @@
 #include "textunit.h"
 #include <iosfwd>
 #include <string>
+#include <unordered_map>
 
 class TextUnitDescrBase {
 public:
@@ -53,8 +54,7 @@ private:
   bool singleton_;
 };
 
-class TextUnitDictionaryImpl;
-class TextUnitDictionary {
+class TextUnitDictionary : public std::unordered_map<uint16_t, TextUnitDescrBase*> {
 public:
   TextUnitDictionary();
   ~TextUnitDictionary();
@@ -65,8 +65,6 @@ private:
   // Prohibit copy/assign; do not implement
   TextUnitDictionary(const TextUnitDictionary&);
   TextUnitDictionary& operator=(const TextUnitDictionary&);
-
-  TextUnitDictionaryImpl* impl_;
 };
 
 class StringTextUnitDescrBase : public TextUnitDescrBase {

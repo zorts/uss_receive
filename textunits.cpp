@@ -4,7 +4,6 @@
 #include <iostream>
 #include <iomanip>
 #include <cassert>
-#include <unordered_map>
 #include <string.h>
 
 StringTextUnitDescrBase::StringTextUnitDescrBase(uint16_t key,
@@ -119,28 +118,26 @@ static StringTextUnitDef stringDefs[] = {
   {0, 0, 0, 0}
 };
 
-class TextUnitDictionaryImpl : public std::unordered_map<uint16_t, TextUnitDescrBase*> {};
 
-TextUnitDictionary::TextUnitDictionary()
-  : impl_(new TextUnitDictionaryImpl) {
+TextUnitDictionary::TextUnitDictionary() {
   StringTextUnitDef* sdef = stringDefs;
   while (sdef->key) {
     StringTextUnitDescrBase* desc =
       new StringTextUnitDescrBase(sdef->key, sdef->mnemonic, sdef->label, sdef->singleton);
-    impl_->insert(std::make_pair(sdef->key, desc));
+    insert(std::make_pair(sdef->key, desc));
     ++sdef;
   }
 }
 
 TextUnitDictionary::~TextUnitDictionary() {
-  for (auto it = impl_->begin(); it != impl_->end(); ++it) {
+  for (auto it = begin(); it != end(); ++it) {
     delete it->second;
   }
-  impl_->clear();
+  clear();
 };
 
 const TextUnitDescrBase* TextUnitDictionary::descriptorFor(uint16_t key) const {
-  auto where = impl_->find(key);
-  return (where == impl_->end() ? (const TextUnitDescrBase*) 0 : where->second);
+  auto where = find(key);
+  return (where == end() ? (const TextUnitDescrBase*) 0 : where->second);
 }
 
