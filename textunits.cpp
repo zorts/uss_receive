@@ -7,7 +7,7 @@
 #include <string.h>
 
 void TextUnitDescrBase::display(std::ostream& s) const {
-  s << "key:" << std::hex << key() << std::dec
+  s << "key:" << std::hex << std::showbase << key() << std::dec << std::noshowbase
     << "; mnemonic: " << mnemonic()
     << "; label: " << label()
     << "; type: " << type()
@@ -67,12 +67,15 @@ NumericTextUnitDescrBase::NumericTextUnitDescrBase(uint16_t key,
 {}
 
 void NumericTextUnitDescrBase::display_(std::ostream& s) const {
-  s << (hex_ ? "hex" : "");
+  s << (hex_ ? "hex;" : "");
 }
 
 void NumericTextUnitDescrBase::display(std::ostream& s, const TextUnit* unit) const {
   assert(unit->key() == key_);
-  s << label() << ": " << (hex_ ? std::hex : std::dec);
+  if (hex_) {
+    s << std::hex << std::showbase ;
+  }
+  s << label() << ": ";
   if (isSingleton() || (unit->number() == 1)) {
     assert(unit->number() == 1);
     s << value(unit->firstTextUnitValue());
@@ -87,7 +90,10 @@ void NumericTextUnitDescrBase::display(std::ostream& s, const TextUnit* unit) co
       }
       s << value(&(*it));
     }
-    s << ")" << std::dec;
+    s << ")";
+  }
+  if (hex_) {
+    s << std::dec << std::noshowbase ;
   }
 }
 
@@ -146,19 +152,19 @@ struct NumericTextUnitDef {
 static NumericTextUnitDef numericDefs[] = {
   {0x000B, "INMSECND", "Secondary space quantity", false, true},
   {0x000C, "INMDIR", "Number of directory blocks", false, true},
-  {0x0028, "INMTERM", "Data transmitted as a message", false, true},
+  {0x0028, "INMTERM", "Data transmitted as a message", false, false},
   {0x0030, "INMBLKSZ", "Block size", false, true},
-  {0x003C, "INMDSORG", "File organization", false, true},
+  {0x003C, "INMDSORG", "File organization", true, true},
   {0x0042, "INMLRECL", "Logical record length", false, true},
-  {0x0049, "INMRECFM", "Record format", false, true},
+  {0x0049, "INMRECFM", "Record format", true, true},
   {0x1023, "INMFVERS", "Origin version number of the data format", false, true},
   {0x102A, "INMRECCT", "Transmitted record count", false, true},
   {0x102C, "INMSIZE", "File size in bytes", false, true},
   {0x102D, "INMFFM", "Filemode number", false, true},
   {0x102F, "INMNUMF", "Number of files transmitted", false, true},
-  {0x8012, "INMTYPE", "Data set type", false, true},
+  {0x8012, "INMTYPE", "Data set type", true, true},
   {0x8018, "INMLSIZE", "Data set size in megabytes.", false, true},
-  {0x8028, "INMEATTR", "Extended attribute status", false, true},
+  {0x8028, "INMEATTR", "Extended attribute status", true, true},
   {0, 0, 0, 0}
 };
 
