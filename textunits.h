@@ -43,8 +43,12 @@ public:
     return singleton_;
   }
 
+  void display(std::ostream& s) const;
   virtual void display(std::ostream& s, const TextUnit* unit) const = 0;
 
+protected:
+
+  virtual void display_(std::ostream& s) const;
 
 private:
   uint16_t key_;
@@ -90,6 +94,10 @@ public:
   virtual void display(std::ostream& s, const TextUnit* unit) const;
   virtual uint64_t value(const TextUnit* u) const;
   virtual uint64_t value(const TextUnitValue* v) const;
+
+protected:
+
+  virtual void display_(std::ostream& s) const;
 
 private:
   bool hex_;

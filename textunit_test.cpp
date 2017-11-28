@@ -40,6 +40,14 @@ namespace {
     delete dict;
   }
 
+  TEST(TextUnitDictionary,Contents) {
+    TextUnitDictionary* dict = new TextUnitDictionary;
+    ASSERT_TRUE(dict);
+    for (auto it = dict->begin(); it != dict->end(); ++it) {
+      it->second->display(std::cerr);
+    }
+    delete dict;
+  }
 
 }  // namespace
 
